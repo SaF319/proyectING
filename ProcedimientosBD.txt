@@ -34,3 +34,5 @@ INSERT INTO (IDMano, IDCarta)
 VALUES(m_IdMano, m_IdCarta)
 END//
 DELIMITER ;
+
+Procedimiento Para Partida

@@ -8,7 +8,7 @@ Orden para insertar cosas a la base de datos
 
 Procedimiento Mano
 
-DELIMITER//
+DELIMITER //
 CREATE PROCEDURE insertarMano(
 IN m_Jugador INT,
 IN m_Partida INT,
@@ -20,12 +20,12 @@ INSERT INTO mano(IDJugador, IDPartida)
 VALUES(m_Jugador, m_Partida);
 SET m_IdMano= LAST_INSERT_ID();
 END//
-DELIMITER;
+DELIMITER ;
 ---------------------------------
 Procedimiento Tabla Compone
 
 DELIMITER //
-CREATE PROCEDURE InsertarCartas(
+CREATE PROCEDURE insertarCartas(
 IN m_IdMano INT,
 IN m_IdCarta VARCHAR(50)
 )
@@ -36,3 +36,16 @@ END//
 DELIMITER ;
 
 Procedimiento Para Partida
+
+DELIMITER //
+CREATE PROCEDURE guardarPartida(
+IN m_IDPartida INT,
+IN m_Hora VARCHAR(50),
+IN m_Fecha DATE,
+IN m_Estado VARCHAR(50)
+)
+BEGIN
+INSERT INTO Partida(IDPartida, hora, fecha, estado)
+VALUES(m_IDPartida, m_Hora, m_Fecha, m_Estado);
+END//
+DELIMITER ;

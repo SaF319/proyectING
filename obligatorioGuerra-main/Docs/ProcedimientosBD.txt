@@ -1,0 +1,38 @@
+Orden para insertar cosas a la base de datos
+
+1- Insertar primero los datos de la partida (fechaHora, Ganador)
+2- Tabla Juegan (IDPartida, IDJugador 1, IDJugador 2)
+3- Mano (IDJugador, IDCarta, IDPartida)
+4- Insertar Cartas jugadas a la Mano
+
+
+Procedimiento Mano
+
+DELIMITER//
+CREATE PROCEDURE insertarMano(
+IN m_Jugador INT,
+IN m_Partida INT,
+OUT m_IdMano INT
+)
+BEGIN
+DECLARE m_IdMano INT;
+INSERT INTO mano(IDJugador, IDPartida)
+VALUES(m_Jugador, m_Partida);
+SET m_IdMano= LAST_INSERT_ID();
+END//
+DELIMITER;
+---------------------------------
+Procedimiento Tabla Compone
+
+DELIMITER //
+CREATE PROCEDURE InsertarCartas(
+IN m_IdMano INT,
+IN m_IdCarta VARCHAR(50)
+)
+BEGIN
+INSERT INTO (IDMano, IDCarta)
+VALUES(m_IdMano, m_IdCarta)
+END//
+DELIMITER ;
+
+Procedimiento Para Partida

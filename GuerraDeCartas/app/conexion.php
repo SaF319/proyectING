@@ -34,4 +34,10 @@ if ($stmt->execute()) {
  
 $stmt->close(); // Cerrar el statement
 $conexion->close(); // Cerrar la conexión
+
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
+    $nombre= $_POST['nombre'];
+    $email= $_POST['email'];
+    $password= $_POST['psw'];
+}
 ?>

@@ -5,7 +5,6 @@
 
     session_start();
 
-    // Inicializar jugadores y el mazo en la sesión
     if (!isset($_SESSION['Jugador1'])) {
         $_SESSION['Jugador1'] = new Jugador("Jugador1", 3);  // Jugador con 3 vidas
     }

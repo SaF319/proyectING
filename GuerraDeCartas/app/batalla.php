@@ -6,23 +6,21 @@
     session_start();
 
     if (!isset($_SESSION['Jugador1'])) {
-        $_SESSION['Jugador1'] = new Jugador("Jugador1", 3);  // Jugador con 3 vidas
+        $_SESSION['Jugador1'] = new Jugador("Jugador1", 3);
     }
 
     if (!isset($_SESSION['Jugador2'])) {
-        $_SESSION['Jugador2'] = new Jugador("Jugador2", 3);  // Jugador con 3 vidas
+        $_SESSION['Jugador2'] = new Jugador("Jugador2", 3);
     }
 
     if (!isset($_SESSION['Mazo'])) {
         $_SESSION['Mazo'] = new Mazo();
     }
 
-    // Inicializar el contador de batallas
     if (!isset($_SESSION['batallas'])) {
         $_SESSION['batallas'] = 0;
     }
 
-    // Inicializar los contadores de victorias
     if (!isset($_SESSION['ganador1'])) {
         $_SESSION['ganador1'] = 0;
     }
@@ -31,32 +29,27 @@
         $_SESSION['ganador2'] = 0;
     }
 
-    // Verificar si se presionó el botón "Volver a Jugar" y reiniciar la sesión
     if (isset($_POST['restart'])) {
         session_destroy();
         header("Location: ".$_SERVER['PHP_SELF']);
         exit();
     }
 
-    // Procesar el juego cuando se presiona el botón "Batallar"
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['batallar'])) {
-        // Verificar si algún jugador tiene 0 vidas y reiniciar el mazo
         if (!$_SESSION['Jugador1']->quedanVidas() || !$_SESSION['Jugador2']->quedanVidas()) {
             $_SESSION['Mazo'] = new Mazo();
-            $_SESSION['Jugador1'] = new Jugador("Jugador1", 3);  // Reiniciar Jugador 1
-            $_SESSION['Jugador2'] = new Jugador("Jugador2", 3);  // Reiniciar Jugador 2
+            $_SESSION['Jugador1'] = new Jugador("Jugador1", 3);
+            $_SESSION['Jugador2'] = new Jugador("Jugador2", 3);
             $_SESSION['batallas'] = 0;
             $_SESSION['ganador1'] = 0;
             $_SESSION['ganador2'] = 0;
             $resultado = "El mazo y los jugadores han sido reiniciados.";
         } else {
-            // Si hay suficientes cartas en el mazo
             if ($_SESSION['Mazo']->contarCartasMazo() >= 2) {
                 $_SESSION['Mazo']->barajarMazo();
                 $carta1 = $_SESSION['Mazo']->getCartaAleatoria();
                 $carta2 = $_SESSION['Mazo']->getCartaAleatoria();
 
-                // Determinar el ganador de la batalla
                 if ($carta1->getNumero() > $carta2->getNumero()) {
                     $resultado = "Ha ganado la Carta 1";
                     $_SESSION['ganador1']++;
@@ -71,7 +64,6 @@
 
                 $_SESSION['batallas']++;
 
-                // Cada 3 batallas, verificar quién ganó más
                 if ($_SESSION['batallas'] == 3) {
                     if ($_SESSION['ganador1'] > $_SESSION['ganador2']) {
                         $_SESSION['Jugador2']->quitarVida();
@@ -83,13 +75,11 @@
                         $resultado .= " Empate en las últimas 3 batallas. Ninguno pierde vida.";
                     }
 
-                    // Reiniciar el contador de batallas y las victorias
                     $_SESSION['batallas'] = 0;
                     $_SESSION['ganador1'] = 0;
                     $_SESSION['ganador2'] = 0;
                 }
 
-                // Verificar si alguno de los jugadores perdió todas las vidas
                 if (!$_SESSION['Jugador1']->quedanVidas()) {
                     $resultado = "Jugador 2 gana, Jugador 1 se quedó sin vidas.";
                 } else if (!$_SESSION['Jugador2']->quedanVidas()) {

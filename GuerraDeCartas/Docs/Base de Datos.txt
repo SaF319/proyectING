@@ -74,9 +74,9 @@ DELIMITER //
 CREATE PROCEDURE guardarPartida(
 IN m_Hora VARCHAR(50),
 IN m_Fecha DATE,
-IN m_Estado VARCHAR(50)
+IN m_Estado VARCHAR(50),
 IN m_IDUsuario INT,
-IN n_IDUsuario INT
+IN n_IDUsuario INT,
 OUT p_IdMano INT,
 OUT s_IdMano INT
 )
@@ -95,3 +95,9 @@ CALL insertarMano(m_IDUsuario, m_IDPartida, p_IdMano);
 CALL insertarMano(n_IDUsuario, m_IDPartida, s_IdMano);
 END//
 DELIMITER ;
+
+-- ADMINISTRADOR
+
+CREATE USER 'ADMIN'@'%' IDENTIFIED BY 'Admin123';
+GRANT ALL PRIVILEGES ON ProyectBd.* TO 'ADMIN'@'%';
+FLUSH PRIVILEGES;

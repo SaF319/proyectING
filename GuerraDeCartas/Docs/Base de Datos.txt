@@ -40,16 +40,17 @@ CREATE TABLE Compone(
 );
 
 -- Procedimiento Mano
+
 DELIMITER //
 CREATE PROCEDURE insertarMano(
-IN m_Jugador INT,
-IN m_Partida INT,
+IN m_IDUsuario INT,
+IN m_IDPartida INT,
 OUT m_IdMano INT
 )
 BEGIN
 DECLARE m_IdMano INT;
-INSERT INTO mano(IDJugador, IDPartida)
-VALUES(m_Jugador, m_Partida);
+INSERT INTO mano(IDUsuario, IDPartida)
+VALUES(m_IDUsuario, m_Partida);
 SET m_IdMano= LAST_INSERT_ID();
 END//
 DELIMITER ;
@@ -71,13 +72,26 @@ DELIMITER ;
 
 DELIMITER //
 CREATE PROCEDURE guardarPartida(
-IN m_IDPartida INT,
 IN m_Hora VARCHAR(50),
 IN m_Fecha DATE,
 IN m_Estado VARCHAR(50)
+IN m_IDUsuario INT,
+IN n_IDUsuario INT
 )
 BEGIN
-INSERT INTO Partida(IDPartida, hora, fecha, estado)
-VALUES(m_IDPartida, m_Hora, m_Fecha, m_Estado);
+DECLARE p_IdMano;
+OUT p_IdMano;
+DECLARE s_IdMano;
+OUT s_IdMano;
+DECLARE m_IDPartida;
+INSERT INTO Partida(hora, fecha, estado)
+VALUES(m_Hora, m_Fecha, m_Estado);
+SET m_IDPartida = LAST_INSERT_ID();
+INSERT INTO Juegan(IDUsuario, IDPartida)
+VALUES(m_IDUsuario, m_IDPartida);
+INSERT INTO Juegan(IDUsuario, IDPartida)
+VALUES(n_IDUsuario, m_IDPartida);
+CALL insertarMano(m_IDUsuario, m_IDPartida, p_IdMano);
+CALL insertarMano(n_IDUsuario, m_IDPartida, s_IdMano);
 END//
 DELIMITER ;

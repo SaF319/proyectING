@@ -1,5 +1,5 @@
 CREATE DATABASE ProyectBD;
-USE basedatodo;
+USE ProyectBD;
 CREATE TABLE Carta(
     IDCarta VARCHAR(50) PRIMARY KEY,
     Palo varchar(20),
@@ -77,13 +77,13 @@ IN m_Fecha DATE,
 IN m_Estado VARCHAR(50)
 IN m_IDUsuario INT,
 IN n_IDUsuario INT
+OUT p_IdMano INT,
+OUT s_IdMano INT
 )
 BEGIN
-DECLARE p_IdMano;
-OUT p_IdMano;
-DECLARE s_IdMano;
-OUT s_IdMano;
-DECLARE m_IDPartida;
+DECLARE p_IdMano INT;
+DECLARE s_IdMano INT;
+DECLARE m_IDPartida INT;
 INSERT INTO Partida(hora, fecha, estado)
 VALUES(m_Hora, m_Fecha, m_Estado);
 SET m_IDPartida = LAST_INSERT_ID();

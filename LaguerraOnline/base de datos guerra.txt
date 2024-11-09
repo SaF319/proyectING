@@ -1,0 +1,126 @@
+CREATE DATABASE ProyectBD;
+USE ProyectBD;
+CREATE TABLE Carta(
+    IDCarta VARCHAR(50) PRIMARY KEY,
+    Palo varchar(20),
+    Numero int,
+    Imagen varchar(255)
+);
+CREATE TABLE Usuario(
+    IDUsuario INT PRIMARY KEY,
+    Nombre VARCHAR(50)
+);
+
+CREATE TABLE Administrador(
+    IDUsuario INT PRIMARY KEY,
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
+);
+
+CREATE TABLE Jugador(
+    IDUsuario INT PRIMARY KEY,
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
+);
+
+CREATE TABLE Partida(
+    IDPartida int PRIMARY KEY,
+    hora TIME,
+    fecha DATE,
+    estado ENUM('suspendido', 'finalizado')
+);
+CREATE TABLE Mano(
+    IDMano int PRIMARY KEY,
+    IDUsuario int,
+    IDPartida int,
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);
+CREATE TABLE Juegan(
+    IDUsuario int,
+    IDPartida int,
+    PRIMARY KEY (IDUsuario, IDPartida),
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);
+CREATE TABLE Compone(
+    IDMano INT,
+    IDCarta VARCHAR(50),
+    PRIMARY KEY (IDMano, IDCarta),
+    FOREIGN KEY (IDMano) REFERENCES Mano(IDMano),
+    FOREIGN KEY (IDCarta) REFERENCES Carta(IDCarta)
+);
+
+ALTER TABLE usuario ADD contra VARCHAR(255);
+
+-- Procedimiento Mano
+DELIMITER //
+CREATE PROCEDURE insertarMano(
+IN m_Jugador INT,
+IN m_Partida INT,
+OUT m_IdMano INT
+)
+BEGIN
+DECLARE m_IdMano INT;
+INSERT INTO mano(IDJugador, IDPartida)
+VALUES(m_Jugador, m_Partida);
+SET m_IdMano= LAST_INSERT_ID();
+END//
+DELIMITER ;
+
+-- Procedimiento Tabla Compone
+
+DELIMITER //
+CREATE PROCEDURE insertarCartas(
+IN m_IdMano INT,
+IN m_IdCarta VARCHAR(50)
+)
+BEGIN
+INSERT INTO Compone(IDMano, IDCarta)
+VALUES(m_IdMano, m_IdCarta);
+END//
+DELIMITER ;
+
+-- Procedimiento para Partida
+
+DELIMITER //
+CREATE PROCEDURE guardarPartida(
+IN m_IDPartida INT,
+IN m_Hora VARCHAR(50),
+IN m_Fecha DATE,
+IN m_Estado VARCHAR(50)
+)
+BEGIN
+INSERT INTO Partida(IDPartida, hora, fecha, estado)
+VALUES(m_IDPartida, m_Hora, m_Fecha, m_Estado);
+END//
+DELIMITER ;
+
+
+//urel
+//http://localhost/phpYmysql/conexion.php
+//http://localhost/phpmyadmin
+--------------------------------------------------------------------
+Ya que la estructura de la base de datos está definida, asegurémonos de tener un usuario rootAdmin en la tabla Usuario, y que su ID también se inserte en la tabla Administrador.
+
+Primero, inserta el usuario rootAdmin en la tabla Usuario:
+
+INSERT INTO Usuario (IDUsuario, Nombre) VALUES (1, 'rootAdmin');
+
+Luego, inserta este usuario en la tabla Administrador, vinculando su IDUsuario:
+
+INSERT INTO Administrador (IDUsuario) VALUES (1);
+
+la contrasela del administrador es :1234
+el usuario del root es :rootAdmin
+
+tube que alterar la tabla usuario
+
+ALTER TABLE usuario ADD contra VARCHAR(255);
+
+INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (1, 'rootAdmin', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
+INSERT INTO Administrador (IDUsuario) VALUES (1);
+
+INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (0, 'playerDefault', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
+INSERT INTO Administrador (IDUsuario) VALUES (1);
+
+INSERT INTO carta(0,'o',1,'C:\xampp\htdocs\LaguerraOnline\juego\imagen\c_o_1');
+

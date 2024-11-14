@@ -131,5 +131,9 @@ INSERT INTO Administrador (IDUsuario) VALUES (1);
 INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (2, 'jugadorPC', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
 INSERT INTO jugador (IDUsuario) VALUES (1);
 
-INSERT INTO Carta (IDCarta, Palo, Numero, Imagen) 
-VALUES (0, 'o', 1, 'juego/imagen/c_o_1.png');
+CREATE USER 'Administrador'@'%' IDENTIFIED BY 'Admin123';
+GRANT ALL PRIVILEGES ON ProyectBD.* TO 'Administrador'@'%';
+CREATE USER 'usuario'@'%' IDENTIFIED BY 'usuario';
+GRANT EXECUTE ON PROCEDURE ProyectBD.insertarMano TO 'usuario'@'%';
+GRANT EXECUTE ON PROCEDURE ProyectBD.insertarCartas TO 'usuario'@'%';
+GRANT EXECUTE ON PROCEDURE ProyectBD.guardarPartida TO 'usuario'@'%';

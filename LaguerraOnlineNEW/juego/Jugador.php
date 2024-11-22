@@ -8,6 +8,7 @@ class Jugador
     private string $nombre;
     private Mazo $mazo;
     private int $rondasGanadas;
+    private int $idJugador;
 
     public function __construct(string $nombre, int $cantVidas,int $idJugador)
     {
@@ -15,6 +16,13 @@ class Jugador
         $this->cantVidas = $cantVidas;
         $this->mazo = new Mazo($idJugador);
         $this->rondasGanadas = 0; // Inicializamos las rondas ganadas a cero SIEMPRE
+        $this->idJugador = $idJugador;
+    }
+
+     // Método para obtener el ID del jugador
+    public function getId(): int
+    {
+        return $this->idJugador;
     }
 
     public function getVidas(): int
@@ -64,6 +72,7 @@ class Jugador
     public function reducirVidas(): void {
         $this->cantVidas--;
     }
+    
 
     public function __toString(): string
     {

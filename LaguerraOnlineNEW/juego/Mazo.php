@@ -74,4 +74,8 @@ class Mazo
         $this->mazo = [];
         $this->cargarMazoDesdeBD();
     }
+
+    public function obtenerTodasLasCartas() {
+        return $this->mazo; // Suponiendo que $cartas es un array de objetos Carta en el mazo
+    }
 }

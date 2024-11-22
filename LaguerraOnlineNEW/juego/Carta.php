@@ -2,7 +2,7 @@
 
 class Carta
 {
-    private const PALOS = ['o', 'c', 'e', 'b'];
+    //private const PALOS = ['o', 'c', 'e', 'b'];
     private $idCarta;
     private $palo;
     private $num;

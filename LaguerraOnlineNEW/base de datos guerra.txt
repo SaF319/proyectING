@@ -25,20 +25,25 @@ CREATE TABLE Jugador(
     FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
 );
 
-CREATE TABLE Partida(
-    IDPartida INT PRIMARY KEY,
-    hora TIME,
-    fecha DATE,
-    estado ENUM('suspendido', 'finalizado')
+CREATE TABLE Partida (
+    idpartida INT PRIMARY KEY AUTO_INCREMENT,
+    hora TIME NOT NULL,
+    fecha DATE NOT NULL,
+    estado ENUM('suspendido', 'finalizado') NOT NULL
 );
 
-CREATE TABLE Mano(
-    IDMano INT PRIMARY KEY,
-    IDUsuario INT,
-    IDPartida INT,
-    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
-    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+
+CREATE TABLE Mano (
+    IDMano INT AUTO_INCREMENT PRIMARY KEY,
+    IDPartida INT NOT NULL,
+    NumeroMano INT NOT NULL,
+    IDGanador INT NOT NULL,
+    IDPerdedor INT NOT NULL,
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida),
+    FOREIGN KEY (IDGanador) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPerdedor) REFERENCES Usuario(IDUsuario)
 );
+
 
 CREATE TABLE Juegan(
     IDUsuario INT,
@@ -55,25 +60,87 @@ CREATE TABLE Compone(
     FOREIGN KEY (IDMano) REFERENCES Mano(IDMano),
     FOREIGN KEY (IDCarta) REFERENCES Carta(IDCarta)
 );
+INSERT INTO carta (IDCarta, palo, numero, imagen)
+VALUES
+(1, 'o', 1, 'juego/imagen/c_o_1.png'),
+(2, 'o', 2, 'juego/imagen/c_o_2.png'),
+(3, 'o', 3, 'juego/imagen/c_o_3.png'),
+(4, 'o', 4, 'juego/imagen/c_o_4.png'),
+(5, 'o', 5, 'juego/imagen/c_o_5.png'),
+(6, 'o', 6, 'juego/imagen/c_o_6.png'),
+(7, 'o', 7, 'juego/imagen/c_o_7.png'),
+(8, 'o', 8, 'juego/imagen/c_o_8.png'),
+(9, 'o', 9, 'juego/imagen/c_o_9.png'),
+(10, 'o', 10, 'juego/imagen/c_o_10.png'),
+(11, 'o', 11, 'juego/imagen/c_o_11.png'),
+(12, 'o', 12, 'juego/imagen/c_o_12.png'),
 
+(13, 'c', 1, 'juego/imagen/c_c_1.png'),
+(14, 'c', 2, 'juego/imagen/c_c_2.png'),
+(15, 'c', 3, 'juego/imagen/c_c_3.png'),
+(16, 'c', 4, 'juego/imagen/c_c_4.png'),
+(17, 'c', 5, 'juego/imagen/c_c_5.png'),
+(18, 'c', 6, 'juego/imagen/c_c_6.png'),
+(19, 'c', 7, 'juego/imagen/c_c_7.png'),
+(20, 'c', 8, 'juego/imagen/c_c_8.png'),
+(21, 'c', 9, 'juego/imagen/c_c_9.png'),
+(22, 'c', 10, 'juego/imagen/c_c_10.png'),
+(23, 'c', 11, 'juego/imagen/c_c_11.png'),
+(24, 'c', 12, 'juego/imagen/c_c_12.png'),
 
+(25, 'e', 1, 'juego/imagen/c_e_1.png'),
+(26, 'e', 2, 'juego/imagen/c_e_2.png'),
+(27, 'e', 3, 'juego/imagen/c_e_3.png'),
+(28, 'e', 4, 'juego/imagen/c_e_4.png'),
+(29, 'e', 5, 'juego/imagen/c_e_5.png'),
+(30, 'e', 6, 'juego/imagen/c_e_6.png'),
+(31, 'e', 7, 'juego/imagen/c_e_7.png'),
+(32, 'e', 8, 'juego/imagen/c_e_8.png'),
+(33, 'e', 9, 'juego/imagen/c_e_9.png'),
+(34, 'e', 10, 'juego/imagen/c_e_10.png'),
+(35, 'e', 11, 'juego/imagen/c_e_11.png'),
+(36, 'e', 12, 'juego/imagen/c_e_12.png'),
+
+(37, 'b', 1, 'juego/imagen/c_b_1.png'),
+(38, 'b', 2, 'juego/imagen/c_b_2.png'),
+(39, 'b', 3, 'juego/imagen/c_b_3.png'),
+(40, 'b', 4, 'juego/imagen/c_b_4.png'),
+(41, 'b', 5, 'juego/imagen/c_b_5.png'),
+(42, 'b', 6, 'juego/imagen/c_b_6.png'),
+(43, 'b', 7, 'juego/imagen/c_b_7.png'),
+(44, 'b', 8, 'juego/imagen/c_b_8.png'),
+(45, 'b', 9, 'juego/imagen/c_b_9.png'),
+(46, 'b', 10, 'juego/imagen/c_b_10.png'),
+(47, 'b', 11, 'juego/imagen/c_b_11.png'),
+(48, 'b', 12, 'juego/imagen/c_b_12.png');
+
+INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (1, 'rootAdmin', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
+INSERT INTO Administrador (IDUsuario) VALUES (1);
+
+INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (2, 'jugadorPC', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
+INSERT INTO jugador (IDUsuario) VALUES (2);
 
 
 
 -- Procedimiento Mano
 DELIMITER //
 CREATE PROCEDURE insertarMano(
-IN m_Jugador INT,
-IN m_Partida INT,
-OUT m_IdMano INT
+    IN m_Jugador INT,
+    IN m_Partida INT,
+    IN m_Resultado ENUM('ganador', 'perdedor'),
+    OUT m_IdMano INT
 )
 BEGIN
-DECLARE m_IdMano INT;
-INSERT INTO mano(IDJugador, IDPartida)
-VALUES(m_Jugador, m_Partida);
-SET m_IdMano= LAST_INSERT_ID();
+    -- Insertar los datos en la tabla Mano
+    INSERT INTO Mano (IDUsuario, IDPartida, Resultado)
+    VALUES (m_Jugador, m_Partida, m_Resultado);
+
+    -- Obtener el último ID auto-generado
+    SET m_IdMano = LAST_INSERT_ID();
 END//
 DELIMITER ;
+
+
 
 -- Procedimiento Tabla Compone
 
@@ -131,9 +198,50 @@ INSERT INTO Administrador (IDUsuario) VALUES (1);
 INSERT INTO usuario (IDUsuario, Nombre, contra) VALUES (2, 'jugadorPC', '$2y$10$LEHWcLQsWIJ5pPGj9Q1Qye375g6XVNC8xGXu4KNxxAU2vKtynO03G');
 INSERT INTO jugador (IDUsuario) VALUES (1);
 
-CREATE USER 'Administrador'@'%' IDENTIFIED BY 'Admin123';
-GRANT ALL PRIVILEGES ON ProyectBD.* TO 'Administrador'@'%';
-CREATE USER 'usuario'@'%' IDENTIFIED BY 'usuario';
-GRANT EXECUTE ON PROCEDURE ProyectBD.insertarMano TO 'usuario'@'%';
-GRANT EXECUTE ON PROCEDURE ProyectBD.insertarCartas TO 'usuario'@'%';
-GRANT EXECUTE ON PROCEDURE ProyectBD.guardarPartida TO 'usuario'@'%';
+INSERT INTO Carta (IDCarta, Palo, Numero, Imagen) 
+VALUES (0, 'o', 1, 'juego/imagen/c_o_1.png');
+
+CREATE TABLE Mano(
+    IDMano INT PRIMARY KEY,
+    IDUsuario INT,
+    IDPartida INT,
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);
+
+
+CREATE TABLE Mano (
+    IDMano INT PRIMARY KEY,                    
+    IDUsuario INT,                             
+    IDPartida INT,                             
+    IDGanador INT,                             
+    IDPerdedor INT,                            
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida),
+    FOREIGN KEY (IDGanador) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPerdedor) REFERENCES Usuario(IDUsuario)
+);
+
+procedimiento de mano antiguo-------
+DELIMITER //
+CREATE PROCEDURE insertarMano(
+IN m_Jugador INT,
+IN m_Partida INT,
+OUT m_IdMano INT
+)
+BEGIN
+DECLARE m_IdMano INT;
+INSERT INTO mano(IDJugador, IDPartida)
+VALUES(m_Jugador, m_Partida);
+SET m_IdMano= LAST_INSERT_ID();
+END//
+DELIMITER ;
+
+CREATE TABLE Mano (
+    IDMano INT PRIMARY KEY AUTO_INCREMENT,   
+    IDUsuario INT,                           
+    IDPartida INT,                           
+    Resultado ENUM('ganador', 'perdedor'),  
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);

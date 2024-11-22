@@ -105,23 +105,6 @@ class Partida {
         }
     }
     
-    private function registrarMano(int $numeroMano, int $idGanador, int $idPerdedor): void {
-        $conexion = Conexion::getInstancia()->getConexion();
-        
-        // Query SQL para insertar los datos en la tabla Mano
-        $sql = "INSERT INTO Mano (IDPartida, NumeroMano, IDGanador, IDPerdedor) VALUES (?, ?, ?, ?)";
-        $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("iiii", $this->idPartida, $numeroMano, $idGanador, $idPerdedor);
-        
-        // Ejecutar el statement
-        if (!$stmt->execute()) {
-            die("Error al registrar la mano: " . $stmt->error);
-        }
-    
-        $stmt->close();
-    }
-    
-
     public function insertarJuegan() {
         // Declarar la variable $count
         $count = 0;
@@ -228,6 +211,7 @@ class Partida {
 
     public function finalizarPartida(): void {
         $this->actualizarEstadoPartida('finalizado');
+
     }
 
     public function batallar(): string {
@@ -242,12 +226,10 @@ class Partida {
             $resultado .= $this->jugadorHumano->getNombre() . " gana la mano " . $this->manoActual . "!<br>";
             $this->manosGanadasHumano++;
             $_SESSION['manosGanadasHumano']++;
-            $this->registrarMano($this->manoActual, $this->jugadorHumano->getId(), $this->jugadorPC->getId());//<---
         } elseif ($this->cartaHumanoActual->getNumero() < $this->cartaPCActual->getNumero()) {
             $resultado .= $this->jugadorPC->getNombre() . " gana la mano " . $this->manoActual . "!<br>";
             $this->manosGanadasPC++;
             $_SESSION['manosGanadasPC']++;
-            $this->registrarMano($this->manoActual, $this->jugadorPC->getId(), $this->jugadorHumano->getId());//<---
         } else {
             $resultado .= "Es un empate en la mano " . $this->manoActual . "<br>";
         }
@@ -293,9 +275,11 @@ class Partida {
     public function verificarEstadoJuego(): ?string {
         if ($this->jugadorHumano->getVidas() <= 0) {
             $this->finalizarPartida(); // Llamar a finalizarPartida si el jugador humano pierde todas las vidas
+            $this->registrarMano('perdedor');
             return $this->jugadorPC->getNombre();
         } elseif ($this->jugadorPC->getVidas() <= 0) {
             $this->finalizarPartida(); // Llamar a finalizarPartida si la PC pierde todas las vidas
+            $this->registrarMano('ganador');
             return $this->jugadorHumano->getNombre();
         }
         return null;
@@ -322,13 +306,80 @@ class Partida {
     public function getJugadores(): array {
         return [$this->jugadorHumano, $this->jugadorPC];
     }
+    
+    
+
+    public function registrarMano(string $resultado): void {
+        // Obtener la conexión a la base de datos
+        $conexion = Conexion::getInstancia()->getConexion();
+    
+        // Verificar si la sesión está iniciada
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        $idPartida=0;
+        // Verificar si el ID de la partida está en la sesión, si no, consultar desde la base de datos
+        if (!isset($_SESSION['idPartida'])) {
+            // Consultar el ID de la última partida insertada
+            $sql = "SELECT MAX(IDPartida) AS ultimaPartida FROM Partida";
+            $stmt = $conexion->prepare($sql);
+            $stmt->execute();
+            $stmt->bind_result($idPartida);
+            $stmt->fetch();
+            $stmt->close();
+    
+            if (!$idPartida) {
+                die("Error: No se ha encontrado ninguna partida registrada.");
+            }
+    
+            // Guardar el ID de la última partida en la sesión
+            $_SESSION['idPartida'] = $idPartida;
+        } else {
+            $idPartida = $_SESSION['idPartida'];
+        }
+        $count = 0;
+        // Verificar si ya existen manos registradas para la partida
+        $sql = "SELECT COUNT(*) FROM Mano WHERE IDPartida = ?";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bind_param("i", $idPartida);
+        $stmt->execute();
+        $stmt->bind_result($count);
+        $stmt->fetch();
+        $stmt->close();
+    
+        /*if ($count > 0) {
+            die("Error: Ya se ha registrado una mano para esta partida.");
+        }*/
+    
+        // Obtener los IDs de los jugadores
+        $idJugadorHumano = $_SESSION['IDUsuario']; // ID del jugador humano desde la sesión
+        $idJugadorPC = 2; // ID fijo para el jugador PC
+    
+        // Insertar las manos
+        $sql = "INSERT INTO Mano (IDUsuario, IDPartida, Resultado) VALUES (?, ?, ?)";
+        $stmt = $conexion->prepare($sql);
+    
+        $resultadoHumano = ($resultado === 'ganador') ? 'ganador' : 'perdedor';
+        $resultadoPC = ($resultado === 'ganador') ? 'perdedor' : 'ganador';
+    
+        // Registrar el resultado del jugador humano
+        $stmt->bind_param("iis", $idJugadorHumano, $idPartida, $resultadoHumano);
+        $stmt->execute();
+    
+        // Registrar el resultado del jugador PC
+        $stmt->bind_param("iis", $idJugadorPC, $idPartida, $resultadoPC);
+        $stmt->execute();
+    
+        $stmt->close();
+    }
+    
+    
+    
 
     //intento de reiniciar partida sin perder el usuario de la session
     public function Finalizar() {
         // Guardar el ID del usuario actual antes de restablecer los datos
         $idUsuario = $_SESSION['IDUsuario'];
-
-        
     
         // Reiniciar los jugadores con vidas y mazos iniciales
         $this->jugadorHumano = new Jugador('Jugador Humano', 3, $idUsuario); // Restauramos las 3 vidas y el IDUsuario
@@ -356,6 +407,7 @@ class Partida {
     
         // Restaurar el ID del usuario en la sesión para asegurar que sigue autenticado
         $_SESSION['IDUsuario'] = $idUsuario;
+
         $this-> insertarJuegan();
         $this->finalizarPartida();
     }

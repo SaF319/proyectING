@@ -79,9 +79,9 @@ class Partida {
         $estado = 'suspendido';
     
         // Query SQL para insertar una nueva partida
-        $sql = "INSERT INTO Partida (hora, fecha, estado) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO Partida (hora, fecha, estado) VALUES (now(), now(), ?)";
         $stmt = $conexion->prepare($sql);
-        $stmt->bind_param("sss", $hora, $fecha, $estado);
+        $stmt->bind_param("s", $estado);
     
         // Ejecutar el statement
         if ($stmt->execute()) {

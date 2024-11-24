@@ -7,25 +7,25 @@ class consultaPartida {
         $this->conexion = $conexion;
     }
 
-    // Método para obtener las últimas 3 partidas de un usuario
-    public function obtenerUltimasPartidas($idUsuario, $limite = 3) {
+    // Método para obtener todas las partidas de un usuario
+    public function obtenerTodasLasPartidas($idUsuario) {
         $query = "
             SELECT p.idpartida, p.hora, p.fecha, p.estado
             FROM Partida p
             INNER JOIN Juegan j ON p.idpartida = j.IDPartida
             WHERE j.IDUsuario = ?
-            ORDER BY p.fecha DESC, p.hora DESC
-            LIMIT ?";
-        
+            ORDER BY p.fecha DESC, p.hora DESC";
+    
         $stmt = $this->conexion->prepare($query);
         if (!$stmt) {
             die("Error en la preparación de la consulta: " . $this->conexion->error);
         }
-        $stmt->bind_param("ii", $idUsuario, $limite);
+        $stmt->bind_param("i", $idUsuario);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
+
 
     public function obtenerCartasPorPartida($idPartida) {
         $query = "

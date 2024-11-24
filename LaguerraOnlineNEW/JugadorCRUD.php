@@ -90,30 +90,29 @@ class JugadorCRUD
      * @return void
      */
     public function leerJugadores(): void 
-    {
-        $sql = "SELECT u.idusuario, u.nombre FROM jugador j JOIN usuario u ON j.idusuario = u.idusuario";
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute();
-        $resultado = $stmt->get_result();
-    
-        if ($resultado->num_rows > 0) {
-            // Recorre los resultados y genera las filas de la tabla
-            while ($jugador = $resultado->fetch_assoc()) {
-                echo "<tr>
-                        <td>" . $jugador['idusuario'] . "</td>
-                        <td>" . $jugador['nombre'] . "</td>
-                        <td>
-                            <!-- Agregar botones u opciones aquí para acciones como editar o eliminar -->
-                            <a href='editarJugador.php?id=" . $jugador['idusuario'] . "'>Editar</a> |
-                            <a href='eliminarJugador.php?id=" . $jugador['idusuario'] . "'>Eliminar</a>
-                        </td>
-                    </tr>";
-            }
-        } else {
-            echo "<tr><td colspan='3'>No hay jugadores cargados en el sistema.</td></tr>";
+{
+    $sql = "SELECT u.idusuario, u.nombre FROM jugador j JOIN usuario u ON j.idusuario = u.idusuario";
+    $stmt = $this->conexion->prepare($sql);
+    $stmt->execute();
+    $resultado = $stmt->get_result();
+
+    if ($resultado->num_rows > 0) {
+        // Recorre los resultados y genera las filas de la tabla
+        while ($jugador = $resultado->fetch_assoc()) {
+            echo "<tr>
+                    <td>" . htmlspecialchars($jugador['idusuario']) . "</td>
+                    <td>" . htmlspecialchars($jugador['nombre']) . "</td>
+                    <td>
+                        <a href='actualizar.php?id=" . $jugador['idusuario'] . "' class='btn btn-warning'>Editar</a>
+                        <a href='eliminar.php?id=" . urlencode($jugador['idusuario']) . "' class='btn btn-danger btn-sm' onclick='return confirm(\"¿Estás seguro de que deseas eliminar este jugador?\");'>Eliminar</a>
+                    </td>
+                </tr>";
         }
+    } else {
+        echo "<tr><td colspan='3'>No hay jugadores cargados en el sistema.</td></tr>";
     }
-    
+}
+
 
     /**
      * Actualiza la información de un jugador (nombre y/o contraseña).

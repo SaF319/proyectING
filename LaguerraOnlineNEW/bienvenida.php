@@ -24,8 +24,8 @@ $consulta = new consultaPartida($conexion);
 // Obtener el ID del usuario desde la sesión
 $idUsuario = $_SESSION['IDUsuario'];
 
-// Obtener las últimas 3 partidas del usuario
-$ultimasPartidas = $consulta->obtenerUltimasPartidas($idUsuario); // Pasamos el IDUsuario aquí
+// Obtener todas las partidas del usuario
+$todasLasPartidas = $consulta->obtenerTodasLasPartidas($idUsuario);
 
 // Cerrar la conexión
 $conexion->close();
@@ -37,6 +37,14 @@ $conexion->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenida</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilo para habilitar el scroll en la tabla */
+        .table-container {
+            max-height: 300px; /* Ajusta la altura según sea necesario */
+            overflow-y: auto;
+            border: 1px solid #ccc; /* Opcional: bordes para diferenciar el área */
+        }
+    </style>
 </head>
 <body>
 
@@ -60,38 +68,40 @@ $conexion->close();
 
         <hr>
 
-        <!-- Últimas partidas -->
-        <h5>Últimas 3 partidas:</h5>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID Partida</th>
-                    <th>Hora</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($ultimasPartidas)): ?>
-                    <?php foreach ($ultimasPartidas as $partida): ?>
-                        <tr>
-                            <td>
-                                <a href="detallePartida.php?idPartida=<?php echo urlencode($partida['idpartida']); ?>" class="text-decoration-none">
-                                    <?php echo htmlspecialchars($partida['idpartida']); ?>
-                                </a>
-                            </td>
-                            <td><?php echo htmlspecialchars($partida['hora']); ?></td>
-                            <td><?php echo htmlspecialchars($partida['fecha']); ?></td>
-                            <td><?php echo htmlspecialchars($partida['estado']); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
+        <!-- Tabla con todas las partidas -->
+        <h5>Todas las partidas:</h5>
+        <div class="table-container">
+            <table class="table table-striped">
+                <thead>
                     <tr>
-                        <td colspan="4">No se encontraron partidas recientes.</td>
+                        <th>ID Partida</th>
+                        <th>Hora</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php if (!empty($todasLasPartidas)): ?>
+                        <?php foreach ($todasLasPartidas as $partida): ?>
+                            <tr>
+                                <td>
+                                    <a href="detallePartida.php?idPartida=<?php echo urlencode($partida['idpartida']); ?>" class="text-decoration-none">
+                                        <?php echo htmlspecialchars($partida['idpartida']); ?>
+                                    </a>
+                                </td>
+                                <td><?php echo htmlspecialchars($partida['hora']); ?></td>
+                                <td><?php echo htmlspecialchars($partida['fecha']); ?></td>
+                                <td><?php echo htmlspecialchars($partida['estado']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="4">No se encontraron partidas.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

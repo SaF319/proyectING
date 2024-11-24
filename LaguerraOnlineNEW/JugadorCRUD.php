@@ -95,15 +95,25 @@ class JugadorCRUD
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute();
         $resultado = $stmt->get_result();
-        
+    
         if ($resultado->num_rows > 0) {
+            // Recorre los resultados y genera las filas de la tabla
             while ($jugador = $resultado->fetch_assoc()) {
-                echo "ID: " . $jugador['idusuario'] . " - Nombre: " . $jugador['nombre'] . "<br>";
+                echo "<tr>
+                        <td>" . $jugador['idusuario'] . "</td>
+                        <td>" . $jugador['nombre'] . "</td>
+                        <td>
+                            <!-- Agregar botones u opciones aquí para acciones como editar o eliminar -->
+                            <a href='editarJugador.php?id=" . $jugador['idusuario'] . "'>Editar</a> |
+                            <a href='eliminarJugador.php?id=" . $jugador['idusuario'] . "'>Eliminar</a>
+                        </td>
+                    </tr>";
             }
         } else {
-            echo "No hay jugadores cargados en el sistema.";
+            echo "<tr><td colspan='3'>No hay jugadores cargados en el sistema.</td></tr>";
         }
     }
+    
 
     /**
      * Actualiza la información de un jugador (nombre y/o contraseña).

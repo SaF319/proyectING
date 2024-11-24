@@ -2,12 +2,13 @@
 
 class Carta
 {
-    //private const PALOS = ['o', 'c', 'e', 'b'];
+    // Propiedades
     private $idCarta;
     private $palo;
     private $num;
     private $imagen;
 
+    // Constructor
     public function __construct($idCarta, $palo = null, $num = null, $imagen = null)
     {
         if ($palo === null || $num === null || $imagen === null) {
@@ -44,6 +45,7 @@ class Carta
         }
     }
 
+    // Métodos públicos para acceder a las propiedades
     public function getNumero()
     {
         return $this->num;
@@ -57,6 +59,11 @@ class Carta
     public function getPalo()
     {
         return $this->palo;
+    }
+
+    public function getIdCarta()
+    {
+        return $this->idCarta;
     }
 
     public function __toString()
@@ -89,3 +96,4 @@ class Carta
         return $cartas;
     }
 }
+

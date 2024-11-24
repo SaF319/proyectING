@@ -30,53 +30,70 @@ $ultimasPartidas = $consulta->obtenerUltimasPartidas($idUsuario); // Pasamos el 
 // Cerrar la conexión
 $conexion->close();
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenida</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h3>Bienvenido, <?php echo htmlspecialchars($nombreUsuario); ?> (ID: <?php echo $_SESSION['IDUsuario']; ?>)</h3>
-    <button onclick="window.location.href='vistaPartida.php'">Comenzar partida</button>
-    <br>
-    <br>
-    <button onclick="window.location.href='cerrarSesion.php'">Cerrar Sesión</button>
-    <hr>
-    <h3>Opciones:</h3>
-    <button onclick="window.location.href='./cambiarNombre.php'">Cambiar Nombre de Usuario</button>
-    <br>
-    <br>
-    <button onclick="window.location.href='./formContra.php'">Cambiar Contraseña</button>
-    <hr>
-    <h3>Últimas 3 partidas:</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID Partida</th>
-                <th>Hora</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($ultimasPartidas)): ?>
-                <?php foreach ($ultimasPartidas as $partida): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($partida['idpartida']); ?></td>
-                        <td><?php echo htmlspecialchars($partida['hora']); ?></td>
-                        <td><?php echo htmlspecialchars($partida['fecha']); ?></td>
-                        <td><?php echo htmlspecialchars($partida['estado']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+
+    <div class="container mt-4">
+        <!-- Encabezado de bienvenida -->
+        <h3 class="mb-4">Bienvenido, <?php echo htmlspecialchars($nombreUsuario); ?> (ID: <?php echo $_SESSION['IDUsuario']; ?>)</h3>
+
+        <!-- Botones de navegación -->
+        <div class="mb-4">
+            <a href="vistaPartida.php" class="btn btn-primary">Comenzar partida</a>
+            <a href="cerrarSesion.php" class="btn btn-danger ml-2">Cerrar Sesión</a>
+        </div>
+
+        <!-- Opciones -->
+        <div class="mb-4">
+            <h5>Opciones:</h5>
+            <a href="./cambiarNombre.php" class="btn btn-warning mb-2">Cambiar Nombre de Usuario</a>
+            <br>
+            <a href="./formContra.php" class="btn btn-warning">Cambiar Contraseña</a>
+        </div>
+
+        <hr>
+
+        <!-- Últimas partidas -->
+        <h5>Últimas 3 partidas:</h5>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td colspan="4">No se encontraron partidas recientes.</td>
+                    <th>ID Partida</th>
+                    <th>Hora</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php if (!empty($ultimasPartidas)): ?>
+                    <?php foreach ($ultimasPartidas as $partida): ?>
+                        <tr>
+                            <td>
+                                <a href="detallePartida.php?idPartida=<?php echo urlencode($partida['idpartida']); ?>" class="text-decoration-none">
+                                    <?php echo htmlspecialchars($partida['idpartida']); ?>
+                                </a>
+                            </td>
+                            <td><?php echo htmlspecialchars($partida['hora']); ?></td>
+                            <td><?php echo htmlspecialchars($partida['fecha']); ?></td>
+                            <td><?php echo htmlspecialchars($partida['estado']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4">No se encontraron partidas recientes.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

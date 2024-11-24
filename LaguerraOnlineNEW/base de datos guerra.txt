@@ -39,11 +39,10 @@ CREATE TABLE Mano (
     NumeroMano INT NOT NULL,
     IDGanador INT NOT NULL,
     IDPerdedor INT NOT NULL,
-    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida),
-    FOREIGN KEY (IDGanador) REFERENCES Usuario(IDUsuario),
-    FOREIGN KEY (IDPerdedor) REFERENCES Usuario(IDUsuario)
+    FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (IDGanador) REFERENCES Usuario(IDUsuario) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (IDPerdedor) REFERENCES Usuario(IDUsuario) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 
 CREATE TABLE Juegan(
     IDUsuario INT,
@@ -56,10 +55,16 @@ CREATE TABLE Juegan(
 CREATE TABLE Compone(
     IDMano INT,
     IDCarta VARCHAR(50),
-    PRIMARY KEY (IDMano, IDCarta),
+    IDUsuario INT,
+    PRIMARY KEY (IDMano, IDCarta, IDUsuario),
     FOREIGN KEY (IDMano) REFERENCES Mano(IDMano),
-    FOREIGN KEY (IDCarta) REFERENCES Carta(IDCarta)
+    FOREIGN KEY (IDCarta) REFERENCES Carta(IDCarta),
+    FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario)
 );
+ALTER TABLE Compone ADD COLUMN IDPartida INT;
+ALTER TABLE compone ADD COLUMN IDJugador INT;
+
+
 INSERT INTO carta (IDCarta, palo, numero, imagen)
 VALUES
 (1, 'o', 1, 'juego/imagen/c_o_1.png'),
@@ -244,4 +249,12 @@ CREATE TABLE Mano (
     Resultado ENUM('ganador', 'perdedor'),  
     FOREIGN KEY (IDUsuario) REFERENCES Usuario(IDUsuario),
     FOREIGN KEY (IDPartida) REFERENCES Partida(IDPartida)
+);
+
+CREATE TABLE Compone(
+    IDMano INT,
+    IDCarta VARCHAR(50),
+    PRIMARY KEY (IDMano, IDCarta),
+    FOREIGN KEY (IDMano) REFERENCES Mano(IDMano),
+    FOREIGN KEY (IDCarta) REFERENCES Carta(IDCarta)
 );

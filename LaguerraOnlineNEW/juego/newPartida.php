@@ -105,21 +105,50 @@ class Partida {
         }
     }
     
-    private function registrarMano(int $numeroMano, int $idGanador, int $idPerdedor): void {
+    private function registrarMano(int $numeroMano, int $idGanador, int $idPerdedor, array $cartas): void {
         $conexion = Conexion::getInstancia()->getConexion();
         
+        // Recuperar el IDPartida desde la sesión
+        if (isset($_SESSION['idPartida'])) {
+            $this->idPartida = $_SESSION['idPartida'];
+        } else {
+            die("Error: No hay una partida activa en la sesión.");
+        }
+    
         // Query SQL para insertar los datos en la tabla Mano
         $sql = "INSERT INTO Mano (IDPartida, NumeroMano, IDGanador, IDPerdedor) VALUES (?, ?, ?, ?)";
         $stmt = $conexion->prepare($sql);
         $stmt->bind_param("iiii", $this->idPartida, $numeroMano, $idGanador, $idPerdedor);
-        
-        // Ejecutar el statement
+    
+        // Ejecutar el statement para insertar la mano
         if (!$stmt->execute()) {
             die("Error al registrar la mano: " . $stmt->error);
         }
     
+        // Obtener el IDMano generado
+        $idMano = $stmt->insert_id;
+    
+        // Cerrar el primer statement antes de preparar uno nuevo
         $stmt->close();
+    
+        // Preparar la consulta para la tabla Compone
+        $sqlCompone = "INSERT INTO Compone (IDMano, IDCarta, IDUsuario, IDPartida, IDJugador) VALUES (?, ?, ?, ?, ?)";
+        $stmtCompone = $conexion->prepare($sqlCompone);
+    
+        // Iterar sobre el array de cartas y asociarlas a la mano
+        foreach ($cartas as $carta) {
+            $stmtCompone->bind_param("isiii", $idMano, $carta['idCarta'], $carta['idUsuario'], $this->idPartida, $carta['idJugador']);
+            
+            // Ejecutar el statement para insertar cada carta en la tabla Compone
+            if (!$stmtCompone->execute()) {
+                die("Error al registrar la carta en la tabla Compone: " . $stmtCompone->error);
+            }
+        }
+    
+        // Cerrar el statement de Compone
+        $stmtCompone->close();
     }
+    
     
 
     public function insertarJuegan() {
@@ -237,25 +266,41 @@ class Partida {
         $this->cartaHumanoActual = $this->jugadorHumano->getCartaMazoAleatoria();
         $this->cartaPCActual = $this->jugadorPC->getCartaMazoAleatoria();
     
+        // Crear el array de cartas para registrar en la tabla Compone
+        $cartas = [
+            [
+                'idCarta' => $this->cartaHumanoActual->getIdCarta(),
+                'idUsuario' => $this->jugadorHumano->getId(),
+                'idJugador' => 1,
+            ],
+            [
+                'idCarta' => $this->cartaPCActual->getIdCarta(),
+                'idUsuario' => $this->jugadorPC->getId(),
+                'idJugador' => 2,
+            ]
+        ];
+        
+    
         // Comparar las cartas
         if ($this->cartaHumanoActual->getNumero() > $this->cartaPCActual->getNumero()) {
             $resultado .= $this->jugadorHumano->getNombre() . " gana la mano " . $this->manoActual . "!<br>";
             $this->manosGanadasHumano++;
             $_SESSION['manosGanadasHumano']++;
-            $this->registrarMano($this->manoActual, $this->jugadorHumano->getId(), $this->jugadorPC->getId());//<---
+            $this->registrarMano($this->manoActual, $this->jugadorHumano->getId(), $this->jugadorPC->getId(), $cartas);
         } elseif ($this->cartaHumanoActual->getNumero() < $this->cartaPCActual->getNumero()) {
             $resultado .= $this->jugadorPC->getNombre() . " gana la mano " . $this->manoActual . "!<br>";
             $this->manosGanadasPC++;
             $_SESSION['manosGanadasPC']++;
-            $this->registrarMano($this->manoActual, $this->jugadorPC->getId(), $this->jugadorHumano->getId());//<---
+            $this->registrarMano($this->manoActual, $this->jugadorPC->getId(), $this->jugadorHumano->getId(), $cartas);
         } else {
             $resultado .= "Es un empate en la mano " . $this->manoActual . "<br>";
+            // En caso de empate, también puedes decidir si registrar la mano sin ganador o omitir el registro.
         }
     
         // Incrementar el contador de manos
         $this->manoActual++;
     
-        // **Asegurarse de actualizar la sesión**
+        // Actualizar la sesión con los datos de la ronda
         $_SESSION['manosGanadasHumano'] = $this->manosGanadasHumano;
         $_SESSION['manosGanadasPC'] = $this->manosGanadasPC;
     
